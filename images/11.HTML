@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SMECHAMART</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+body{margin:0;font-family:'Poppins',sans-serif;background:#f9fafb;color:#333;}
+/* --- Slideshow --- */
+#welcome{position:relative;height:100vh;overflow:hidden;}
+.slides{position:absolute;top:0;left:0;width:100%;height:100%;}
+.slide{position:absolute;width:100%;height:100%;background-size:cover;background-position:center;opacity:0;transition:opacity 0.6s ease;display:flex;justify-content:center;align-items:center;}
+.slide.active{opacity:1;}
+.caption{background:rgba(0,0,0,0.6);padding:20px 30px;border-radius:10px;text-align:center;color:white;max-width:700px;}
+.caption h1{font-size:28px;margin-bottom:10px;}
+.caption p{font-size:18px;margin-bottom:15px;}
+.bt_main{display:inline-block;background:#ff9800;color:#fff;padding:10px 20px;border-radius:6px;border:none;font-weight:bold;cursor:pointer;transition:0.3s;}
+.bt_main:hover{background:#e68900;}
+.prev,.next{cursor:pointer;position:absolute;top:50%;padding:12px;color:white;font-weight:bold;font-size:22px;border-radius:50%;background:rgba(0,0,0,0.5);}
+.next{right:20px;}
+.prev{left:20px;}
+
+/* --- Belanja --- */
+#belanja{display:none;opacity:0;transform:translateY(30px);transition:opacity 0.6s ease,transform 0.6s ease;}
+#belanja.show{display:block;opacity:1;transform:translateY(0);}
+header{background:linear-gradient(135deg,#2e7d32,#1b5e20);color:white;text-align:center;padding:20px;}
+header h1{margin:0;font-size:28px;}
+nav{display:flex;justify-content:space-between;align-items:center;background:linear-gradient(135deg,#ced7e0,#698679);padding:12px;flex-wrap:wrap;}
+.nav-left{cursor:pointer;font-weight:bold;color:#333;}
+
+/* Produk */
+.produk-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px;padding:30px;max-width:1200px;margin:auto;}
+.produk{background:white;padding:15px;border-radius:15px;text-align:center;box-shadow:0 4px 12px rgba(0,0,0,0.1);position:relative;}
+.produk img{max-width:100%;border-radius:10px;margin-bottom:10px;}
+.pesan-btn{display:inline-block;margin-top:10px;padding:8px 14px;background:#2e7d32;color:white;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600;}
+.order-list{margin-top:10px;text-align:left;font-size:14px;background:#f4f4f4;padding:8px;border-radius:8px;}
+.order-list ul{padding-left:20px;margin:5px 0;}
+.order-list li{margin-bottom:5px;}
+.order-total{font-weight:bold;margin-top:5px;color:#1b5e20;}
+
+/* Tentang, Galeri, Kontak */
+#tentang,#galeri,#kontak{display:none;padding:40px;max-width:900px;margin:auto;line-height:1.6;}
+#tentang h2,#galeri h2,#kontak h2{text-align:center;margin-bottom:20px;}
+.btn-back{margin-top:20px;padding:10px 20px;background:#2e7d32;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:600;}
+.btn-back:hover{background:#1b5e20;}
+
+/* Keranjang */
+#cart{position:fixed;bottom:20px;right:20px;background:gold;padding:15px;border-radius:50%;font-size:22px;font-weight:bold;cursor:pointer;box-shadow:0 4px 10px rgba(0,0,0,0.2);z-index:1000;}
+#cart span{background:red;color:white;padding:2px 6px;border-radius:50%;font-size:14px;margin-left:5px;}
+#cart-panel{display:none;position:fixed;bottom:70px;right:20px;width:280px;background:white;border:1px solid #ccc;border-radius:10px;box-shadow:0 4px 12px rgba(0,0,0,0.2);padding:15px;z-index:1000;}
+#cart-panel h3{margin-top:0;}
+#cart-panel ul{list-style:none;padding:0;max-height:150px;overflow-y:auto;margin-bottom:10px;}
+#cart-panel ul li{padding:5px 0;border-bottom:1px solid #eee;}
+#cart-panel button{width:100%;padding:8px;background:#2e7d32;color:white;border:none;border-radius:8px;font-weight:bold;cursor:pointer;}
+#cart-panel button:hover{background:#1b5e20;}
+</style>
+</head>
+<body>
+
+<!-- Slideshow -->
+<section id="welcome">
+  <div class="slides">
+    <div class="slide active" style="background-image:url('images/slide1.jpg')">
+      <div class="caption">
+        <h1>Selamat Datang di SMECHAMART</h1>
+        <p>Belanja mudah, murah, dan lengkap untuk kebutuhanmu!</p>
+        <button class="bt_main" onclick="showBelanja()">Mulai Belanja</button>
+      </div>
+    </div>
+    <div class="slide" style="background-image:url('images/slide2.jpg')">
+      <div class="caption">
+        <h1>Promo Menarik</h1>
+        <p>Dapatkan diskon spesial untuk berbagai produk</p>
+        <button class="bt_main" onclick="showBelanja()">Lihat Promo</button>
+      </div>
+    </div>
+    <div class="slide" style="background-image:url('images/slide3.jpg')">
+      <div class="caption">
+        <h1>Lengkap & Terjangkau</h1>
+        <p>Semua kebutuhan tersedia hanya di SMECHAMART</p>
+        <button class="bt_main" onclick="showBelanja()">Belanja Sekarang</button>
+      </div>
+    </div>
+  </div>
+  <a class="prev" onclick="moveSlide(-1)">&#10094;</a>
+  <a class="next" onclick="moveSlide(1)">&#10095;</a>
+</section>
+
+<!-- Belanja -->
+<section id="belanja">
+  <header><h1>SMECHAMART</h1></header>
+  <nav>
+    <div class="nav-left" onclick="renderProduk(jajanan,'jajanan')">Jajanan</div>
+    <div class="nav-left" onclick="renderProduk(dessert,'dessert')">Dessert</div>
+    <div class="nav-left" onclick="renderProduk(atk,'atk')">ATK</div>
+    <div class="nav-left" onclick="showPage('tentang')">Tentang Kami</div>
+    <div class="nav-left" onclick="showPage('galeri')">Galeri</div>
+    <div class="nav-left" onclick="showPage('kontak')">Hubungi Kami</div>
+  </nav>
+  <div id="produk-list" class="produk-list"></div>
+  <div id="tentang"><h2>Tentang Kami</h2><p>SMECHAMART adalah toko serba ada untuk kebutuhan sehari-hari.</p><button class="btn-back" onclick="backToBelanja()">Kembali</button></div>
+  <div id="galeri"><h2>Galeri</h2><p>Koleksi foto produk unggulan kami.</p><button class="btn-back" onclick="backToBelanja()">Kembali</button></div>
+  <div id="kontak"><h2>Hubungi Kami</h2><p>Kontak: smechamart@example.com</p><button class="btn-back" onclick="backToBelanja()">Kembali</button></div>
+</section>
+
+<!-- Keranjang -->
+<div id="cart" onclick="toggleCart()">🛒 <span id="cart-count">0</span></div>
+<div id="cart-panel">
+  <h3>Keranjang</h3>
+  <ul id="cart-items"></ul>
+  <button onclick="checkout()">Checkout</button>
+</div>
+
+<script>
+// === Data Produk Manual ===
+const jajanan = [
+  {nama:"Jajanan 1", harga:2000, img:"images/jajanan1.jpg"},
+  {nama:"Jajanan 2", harga:2500, img:"images/jajanan2.jpg"},
+  {nama:"Jajanan 3", harga:3000, img:"images/jajanan3.jpg"},
+];
+const dessert = [
+  {nama:"Dessert 1", harga:3000, img:"images/dessert1.jpg"},
+  {nama:"Dessert 2", harga:3500, img:"images/dessert2.jpg"},
+];
+const atk = [
+  {nama:"ATK 1", harga:4000, img:"images/atk1.jpg"},
+  {nama:"ATK 2", harga:4500, img:"images/atk2.jpg"},
+];
+
+// === Keranjang Utama ===
+let cart = [];
+
+// render produk + daftar pesanan di bawahnya
+function renderProduk(list,kategori){
+  let container=document.getElementById("produk-list");
+  container.innerHTML="";
+  document.getElementById("tentang").style.display="none";
+  document.getElementById("galeri").style.display="none";
+  document.getElementById("kontak").style.display="none";
+
+  list.forEach((p,idx)=>{
+    let div=document.createElement("div");
+    div.className="produk";
+    div.innerHTML=`
+      <img src="${p.img}" alt="${p.nama}">
+      <h3>${p.nama}</h3>
+      <p>Rp ${p.harga.toLocaleString()}</p>
+      <div class="pesan-btn" onclick="addToCart('${p.nama}',${p.harga},'${p.img}',${idx},'${kategori}')">Pesan</div>
+      <div id="order-${kategori}-${idx}" class="order-list" style="display:none">
+        <b>Pesanan:</b>
+        <ul id="list-${kategori}-${idx}"></ul>
+        <div id="total-${kategori}-${idx}" class="order-total"></div>
+      </div>
+    `;
+    container.appendChild(div);
+  });
+}
+
+// menambahkan produk ke daftar pesanan lokal (bawah produk)
+function addToCart(nama,harga,img,idx,kategori){
+  let orderDiv=document.getElementById(`order-${kategori}-${idx}`);
+  let ul=document.getElementById(`list-${kategori}-${idx}`);
+  orderDiv.style.display="block";
+
+  let li=document.createElement("li");
+  li.innerHTML=`
+    ${nama} - Rp ${harga.toLocaleString()}
+    <button onclick="moveToMainCart('${nama}',${harga},'${img}',this,'${kategori}',${idx})">Keranjang</button>
+  `;
+  ul.appendChild(li);
+  updateLocalTotal(kategori,idx);
+}
+
+// update total per produk
+function updateLocalTotal(kategori,idx){
+  let ul=document.getElementById(`list-${kategori}-${idx}`);
+  let items=ul.querySelectorAll("li");
+  let total=0;
+  items.forEach(li=>{
+    let text=li.textContent.replace("Keranjang","").trim();
+    let harga=parseInt(text.split("Rp")[1].replace(/\./g,""));
+    total+=harga;
+  });
+  document.getElementById(`total-${kategori}-${idx}`).textContent="Total: Rp "+total.toLocaleString();
+}
+
+// pindahkan ke keranjang utama
+function moveToMainCart(nama,harga,img,btn,kategori,idx){
+  cart.push({nama,harga,img,selected:true});
+  updateCart();
+  btn.parentElement.remove(); // hapus dari daftar lokal
+  updateLocalTotal(kategori,idx);
+}
+
+// update keranjang utama
+function updateCart(){
+  document.getElementById("cart-count").innerText=cart.length;
+  let ul=document.getElementById("cart-items");
+  ul.innerHTML="";
+  let total=0;
+  cart.forEach((item,i)=>{
+    let li=document.createElement("li");
+    li.innerHTML=`
+      <input type="checkbox" ${item.selected?"checked":""} onchange="toggleSelect(${i},this)">
+      ${item.nama} - Rp ${item.harga.toLocaleString()}
+    `;
+    ul.appendChild(li);
+    if(item.selected) total+=item.harga;
+  });
+
+  // tampilkan total harga di bawah daftar
+  let totalDiv=document.createElement("div");
+  totalDiv.style.fontWeight="bold";
+  totalDiv.style.margin="10px 0";
+  totalDiv.textContent=`Total: Rp ${total.toLocaleString()}`;
+  ul.appendChild(totalDiv);
+}
+
+// ubah status centang produk
+function toggleSelect(i,checkbox){
+  cart[i].selected=checkbox.checked;
+  updateCart();
+}
+
+// toggle panel keranjang
+function toggleCart(){
+  let panel=document.getElementById("cart-panel");
+  panel.style.display=panel.style.display==="block"?"none":"block";
+}
+
+// checkout hanya produk yang dicentang
+function checkout(){
+  let selectedItems=cart.filter(item=>item.selected);
+  if(selectedItems.length===0){
+    alert("Pilih produk dulu sebelum checkout!");
+    return;
+  }
+  let total=selectedItems.reduce((sum,it)=>sum+it.harga,0);
+  alert("Checkout berhasil!\nTotal: Rp "+total.toLocaleString());
+  // kosongkan hanya yang dicentang
+  cart=cart.filter(item=>!item.selected);
+  updateCart();
+  toggleCart();
+}
+
+// === Slideshow ===
+let slideIndex=0;
+const slides=document.querySelectorAll(".slide");
+function showSlide(i){
+  slides.forEach(s=>s.classList.remove("active"));
+  slideIndex=(i+slides.length)%slides.length;
+  slides[slideIndex].classList.add("active");
+}
+function moveSlide(n){showSlide(slideIndex+n);}
+
+// === Navigasi ===
+function showBelanja(){
+  document.getElementById("welcome").style.display="none";
+  document.getElementById("belanja").classList.add("show");
+  renderProduk(jajanan,'jajanan');
+}
+function showPage(id){
+  document.getElementById("produk-list").innerHTML="";
+  document.getElementById("tentang").style.display="none";
+  document.getElementById("galeri").style.display="none";
+  document.getElementById("kontak").style.display="none";
+  document.getElementById(id).style.display="block";
+}
+function backToBelanja(){
+  document.getElementById("tentang").style.display="none";
+  document.getElementById("galeri").style.display="none";
+  document.getElementById("kontak").style.display="none";
+  renderProduk(jajanan,'jajanan');
+}
+</script>
+</body>
+</html>

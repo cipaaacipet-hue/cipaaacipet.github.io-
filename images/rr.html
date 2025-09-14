@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SMECHAMART</title>
+  <style>
+    body {font-family: Arial, sans-serif;margin:0;padding:0;background:#f4f6f8;}
+    header {background:#2e7d32;color:white;padding:15px;text-align:center;font-size:20px;font-weight:bold;}
+    .produk {display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:15px;padding:20px;}
+    .card {background:white;border-radius:10px;padding:15px;text-align:center;box-shadow:0 2px 5px rgba(0,0,0,0.1);}
+    .card img {width:100px;height:100px;object-fit:cover;margin-bottom:10px;}
+    .btn {background:#2e7d32;color:white;padding:8px 15px;border:none;border-radius:6px;cursor:pointer;font-weight:bold;}
+    .btn:hover {opacity:0.9;}
+    .keranjang {position:fixed;top:20px;right:20px;cursor:pointer;font-size:22px;}
+    #daftar-pesanan {position:fixed;right:0;top:0;width:320px;height:100%;background:white;box-shadow:-3px 0 8px rgba(0,0,0,0.2);padding:20px;overflow:auto;display:none;z-index:1500;}
+    #qris-modal {display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);justify-content:center;align-items:center;z-index:2000;}
+    #qris-modal .box {background:white;padding:20px;border-radius:12px;max-width:350px;text-align:center;}
+    #admin-panel {display:none;padding:20px;}
+    table {width:100%;border-collapse:collapse;margin-top:15px;}
+    table, th, td {border:1px solid #ccc;}
+    th, td {padding:8px;text-align:center;}
+    nav {background:#eee;padding:10px;text-align:center;}
+    nav button {margin:5px;padding:8px 15px;border:none;border-radius:5px;cursor:pointer;}
+  </style>
+</head>
+<body>
+
+<header>SMECHAMART</header>
+
+<nav>
+  <button onclick="showSection('produk')">Produk</button>
+  <button onclick="showSection('admin-panel')">Admin Panel</button>
+</nav>
+
+<!-- Produk -->
+<div class="produk" id="produk">
+  <div class="card">
+    <img src="https://via.placeholder.com/100" alt="Produk 1">
+    <h4>Indomie Goreng</h4>
+    <p>Rp 5.000</p>
+    <button class="btn" onclick="tambahKeranjang('Indomie Goreng',5000)">Tambah</button>
+  </div>
+  <div class="card">
+    <img src="https://via.placeholder.com/100" alt="Produk 2">
+    <h4>Teh Botol</h4>
+    <p>Rp 4.000</p>
+    <button class="btn" onclick="tambahKeranjang('Teh Botol',4000)">Tambah</button>
+  </div>
+</div>
+
+<!-- Keranjang Icon -->
+<div class="keranjang" onclick="togglePesanan()">🛒</div>
+
+<!-- Daftar Pesanan -->
+<div id="daftar-pesanan">
+  <h3>Daftar Pesanan</h3>
+  <ul id="list-pesanan"></ul>
+  <p><b>Total: </b><span id="total-harga">Rp 0</span></p>
+  <button class="btn" onclick="checkoutPesanan()">Checkout</button>
+</div>
+
+<!-- Modal Pembayaran -->
+<div id="qris-modal">
+  <div class="box">
+    <h2>Pembayaran</h2>
+    <p>Pilih metode pembayaran:</p>
+    <select id="metode">
+      <option value="qris">QRIS</option>
+      <option value="gopay">GoPay</option>
+      <option value="tunai">Tunai (COD)</option>
+    </select>
+    <div id="qr-area" style="margin:15px 0;">
+      <img id="qris-img" src="qris.png" style="width:200px;display:none;">
+      <img id="gopay-img" src="gopay.png" style="width:200px;display:none;">
+      <p id="tunai-info" style="display:none;">Silakan bayar tunai kepada kasir.</p>
+    </div>
+    <p><b>Total Bayar:</b> <span id="total-bayar">Rp 0</span></p>
+    <button class="btn" onclick="konfirmasiBayar()">Konfirmasi</button>
+    <br><br>
+    <button onclick="tutupQris()">Batal</button>
+  </div>
+</div>
+
+<!-- Admin Panel -->
+<div id="admin-panel">
+  <h2>Riwayat Transaksi</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>No</th>
+        <th>Produk</th>
+        <th>Total</th>
+        <th>Metode</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody id="riwayat-body"></tbody>
+  </table>
+</div>
+
+<script>
+let pesanan = [];
+let riwayat = [];
+
+// Tambah ke keranjang
+function tambahKeranjang(nama,harga){
+  pesanan.push({nama,harga,jumlah:1});
+  renderPesanan();
+}
+
+// Render daftar pesanan
+function renderPesanan(){
+  let list = document.getElementById("list-pesanan");
+  list.innerHTML = "";
+  let total = 0;
+  pesanan.forEach((p,i)=>{
+    total += p.harga * p.jumlah;
+    let li = document.createElement("li");
+    li.innerText = p.nama + " x" + p.jumlah + " - Rp " + (p.harga*p.jumlah).toLocaleString();
+    list.appendChild(li);
+  });
+  document.getElementById("total-harga").innerText = "Rp " + total.toLocaleString();
+}
+
+// Toggle keranjang
+function togglePesanan(){
+  let box = document.getElementById("daftar-pesanan");
+  box.style.display = (box.style.display==="block")?"none":"block";
+}
+
+// Checkout
+function checkoutPesanan(){
+  if(pesanan.length===0){alert("Keranjang kosong!");return;}
+  let total = 0;
+  pesanan.forEach(p=> total+=p.harga*p.jumlah);
+  document.getElementById("total-bayar").innerText = "Rp " + total.toLocaleString();
+  document.getElementById("qris-modal").style.display="flex";
+  updateMetode(); // update default tampilan
+}
+
+// Update metode tampilan
+document.getElementById("metode").addEventListener("change", updateMetode);
+function updateMetode(){
+  let val = document.getElementById("metode").value;
+  document.getElementById("qris-img").style.display = (val==="qris")?"block":"none";
+  document.getElementById("gopay-img").style.display = (val==="gopay")?"block":"none";
+  document.getElementById("tunai-info").style.display = (val==="tunai")?"block":"none";
+}
+
+// Konfirmasi pembayaran
+function konfirmasiBayar(){
+  let total = 0;
+  pesanan.forEach(p=> total+=p.harga*p.jumlah);
+  let metode = document.getElementById("metode").value;
+  
+  // Simpan riwayat
+  riwayat.push({produk:pesanan.map(p=>p.nama).join(", "), total:"Rp "+total.toLocaleString(), metode, status:"Selesai"});
+  renderRiwayat();
+
+  alert("Terima kasih, pembayaran via "+metode+" berhasil!");
+  pesanan = [];
+  renderPesanan();
+  document.getElementById("daftar-pesanan").style.display="none";
+  document.getElementById("qris-modal").style.display="none";
+}
+
+// Tutup modal
+function tutupQris(){
+  document.getElementById("qris-modal").style.display="none";
+}
+
+// Render riwayat di admin
+function renderRiwayat(){
+  let body = document.getElementById("riwayat-body");
+  body.innerHTML = "";
+  riwayat.forEach((r,i)=>{
+    let tr = document.createElement("tr");
+    tr.innerHTML = `<td>${i+1}</td><td>${r.produk}</td><td>${r.total}</td><td>${r.metode}</td><td>${r.status}</td>`;
+    body.appendChild(tr);
+  });
+}
+
+// Switch section
+function showSection(id){
+  document.getElementById("produk").style.display="none";
+  document.getElementById("admin-panel").style.display="none";
+  document.getElementById(id).style.display="block";
+}
+</script>
+
+</body>
+</html>
